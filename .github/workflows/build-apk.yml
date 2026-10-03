@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     name: Build Android APK
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
 
     steps:
       - name: Checkout repository
@@ -20,17 +20,50 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
-          cache: "pip"
 
       - name: Install system dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y             git             zip             unzip             openjdk-17-jdk             autoconf             automake             libtool             pkg-config             zlib1g-dev             libncurses5-dev             libncursesw5-dev             cmake             libffi-dev             libssl-dev
 
-      - name: Install Buildozer
+          sudo apt-get install -y \
+            autoconf \
+            automake \
+            autopoint \
+            libtool \
+            m4 \
+            pkg-config \
+            cmake \
+            build-essential \
+            git \
+            zip \
+            unzip \
+            openjdk-17-jdk \
+            libffi-dev \
+            libssl-dev \
+            zlib1g-dev \
+            libncurses5-dev \
+            libncursesw5-dev
+
+      - name: Check Autoconf
         run: |
-          python -m pip install --upgrade pip
-          python -m pip install buildozer cython
+          autoconf --version
+          automake --version
+          libtool --version
+          autoreconf --version
+
+      - name: Upgrade pip
+        run: |
+          python -m pip install --upgrade pip setuptools wheel
+
+      - name: Install Python dependencies
+        run: |
+          pip install "Cython<3"
+          pip install buildozer
+
+      - name: Clean previous Buildozer files
+        run: |
+          rm -rf .buildozer
+          rm -rf bin
 
       - name: Build APK
         run: |
@@ -43,4 +76,3 @@ jobs:
           path: bin/*.apk
           if-no-files-found: error
           retention-days: 14
-
