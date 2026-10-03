@@ -8,6 +8,7 @@ on:
 
   workflow_dispatch:
 
+
 jobs:
   build:
     name: Build Android APK
@@ -15,32 +16,36 @@ jobs:
 
     steps:
 
-      # =========================
-      # Получение проекта
-      # =========================
+      # ========================================
+      # 1. Получаем проект
+      # ========================================
       - name: Checkout
         uses: actions/checkout@v4
 
-      # =========================
-      # Python
-      # =========================
+
+      # ========================================
+      # 2. Python
+      # ========================================
       - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      # =========================
-      # Java
-      # =========================
+
+      # ========================================
+      # 3. Java
+      # Java нужна Android-инструментам сборки
+      # ========================================
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: "17"
 
-      # =========================
-      # Системные зависимости
-      # =========================
+
+      # ========================================
+      # 4. Системные зависимости
+      # ========================================
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -62,69 +67,96 @@ jobs:
             libncurses5-dev \
             libncursesw5-dev
 
-      # =========================
-      # Проверка инструментов
-      # =========================
+
+      # ========================================
+      # 5. Проверяем только необходимые
+      # инструменты
+      # ========================================
       - name: Check tools
         run: |
           echo "Python:"
           python --version
 
+          echo ""
           echo "Pip:"
           pip --version
 
-          echo "Autoconf:"
-          autoconf --version
-
-          echo "Automake:"
-          automake --version
-
-          echo "Libtool:"
-          libtool --version
-
+          echo ""
           echo "Java:"
           java -version
 
-      # =========================
-      # Python packages
-      # =========================
+          echo ""
+          echo "Java compiler:"
+          javac -version
+
+          echo ""
+          echo "Git:"
+          git --version
+
+
+      # ========================================
+      # 6. Устанавливаем Buildozer
+      # ========================================
       - name: Install Buildozer
         run: |
           python -m pip install --upgrade pip
           python -m pip install --upgrade setuptools wheel
+
           python -m pip install "Cython<3"
           python -m pip install buildozer
 
-      # =========================
-      # Проверяем Buildozer
-      # =========================
+
+      # ========================================
+      # 7. Проверяем Buildozer
+      # ========================================
       - name: Check Buildozer
         run: |
           buildozer --version
 
-      # =========================
-      # Очистка старой сборки
-      # =========================
+
+      # ========================================
+      # 8. Проверяем файлы проекта
+      # ========================================
+      - name: Check project
+        run: |
+          echo "Файлы проекта:"
+          ls -lah
+
+          echo ""
+
+          if [ -f buildozer.spec ]; then
+            echo "buildozer.spec найден"
+          else
+            echo "ОШИБКА: buildozer.spec не найден!"
+            exit 1
+          fi
+
+
+      # ========================================
+      # 9. Очистка
+      # ========================================
       - name: Clean
         run: |
           rm -rf .buildozer
           rm -rf bin
 
-      # =========================
-      # Сборка APK
-      # =========================
+
+      # ========================================
+      # 10. Сборка APK
+      # ========================================
       - name: Build APK
         run: |
           buildozer -v android debug
 
-      # =========================
-      # Проверяем результат
-      # =========================
+
+      # ========================================
+      # 11. Проверяем APK
+      # ========================================
       - name: Check APK
         if: always()
         run: |
           echo "================================"
-          echo "Содержимое папки bin:"
+          echo "Содержимое bin:"
           echo "================================"
 
           ls -lah bin || true
@@ -136,16 +168,10 @@ jobs:
 
           find . -type f -name "*.apk" -print
 
-          echo ""
-          echo "================================"
-          echo "Поиск AAB:"
-          echo "================================"
 
-          find . -type f -name "*.aab" -print
-
-      # =========================
-      # Сохраняем APK
-      # =========================
+      # ========================================
+      # 12. Загружаем APK
+      # ========================================
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
