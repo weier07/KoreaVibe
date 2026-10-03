@@ -21,7 +21,6 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-
       # =========================
       # Python
       # =========================
@@ -30,6 +29,14 @@ jobs:
         with:
           python-version: "3.11"
 
+      # =========================
+      # Java
+      # =========================
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
 
       # =========================
       # Системные зависимости
@@ -49,16 +56,14 @@ jobs:
             m4 \
             pkg-config \
             cmake \
-            openjdk-17-jdk \
             libffi-dev \
             libssl-dev \
             zlib1g-dev \
             libncurses5-dev \
             libncursesw5-dev
 
-
       # =========================
-      # Проверяем инструменты
+      # Проверка инструментов
       # =========================
       - name: Check tools
         run: |
@@ -80,7 +85,6 @@ jobs:
           echo "Java:"
           java -version
 
-
       # =========================
       # Python packages
       # =========================
@@ -91,7 +95,6 @@ jobs:
           python -m pip install "Cython<3"
           python -m pip install buildozer
 
-
       # =========================
       # Проверяем Buildozer
       # =========================
@@ -99,15 +102,13 @@ jobs:
         run: |
           buildozer --version
 
-
       # =========================
-      # Очистка
+      # Очистка старой сборки
       # =========================
       - name: Clean
         run: |
           rm -rf .buildozer
           rm -rf bin
-
 
       # =========================
       # Сборка APK
@@ -116,6 +117,31 @@ jobs:
         run: |
           buildozer -v android debug
 
+      # =========================
+      # Проверяем результат
+      # =========================
+      - name: Check APK
+        if: always()
+        run: |
+          echo "================================"
+          echo "Содержимое папки bin:"
+          echo "================================"
+
+          ls -lah bin || true
+
+          echo ""
+          echo "================================"
+          echo "Поиск APK:"
+          echo "================================"
+
+          find . -type f -name "*.apk" -print
+
+          echo ""
+          echo "================================"
+          echo "Поиск AAB:"
+          echo "================================"
+
+          find . -type f -name "*.aab" -print
 
       # =========================
       # Сохраняем APK
