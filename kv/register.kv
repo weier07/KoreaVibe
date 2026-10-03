@@ -1,1 +1,56 @@
-
+<RegisterScreen>:
+    BoxLayout:
+        orientation: "vertical"
+        padding: 35 
+        spacing: 15
+    
+        Label:
+            text: "Создание аккаунта"
+            font_size: 30
+            bold: True
+            size_hint_y: None
+            height: 55
+        
+        TextInput:
+            id: username
+            hint_text: "Имя пользователя"
+            multiline: False
+            size_hint_y: None
+            height: 55
+        
+        TextInput:
+            id: password
+            hint_text: "Пароль"
+            multiline: False
+            password: True
+            size_hint_y: None
+            height: 55
+            
+        TextInput:
+            id: password2
+            hint_text: "Повторите пароль"
+            multiline: False
+            password: True
+            size_hint_y: None
+            height: 55
+        
+        Label:
+            id: message
+            text: ""
+            color: 1, 0.2, 0.2, 1
+            size_hint_y: None
+            height: 40
+            
+        Button:
+            text: "Зарегистрироваться"
+            font_size: 18
+            size_hint_y: None
+            height: 55
+            on_release: root.register()
+        
+        Button:
+            text: "У меня уже есть аккаунт"
+            font_size: 18
+            size_hint_y: None
+            height: 55
+            on_release: app.root.current = "login"
