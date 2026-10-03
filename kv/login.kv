@@ -1,1 +1,58 @@
-
+<LoginScreen>:
+    FloatLayout:
+        Image:
+            source: "Images/Font_Login.png"
+            size: self.parent.size
+            pos: self.parent.pos
+            allow_stretch: True
+            keep_ratio: False
+        
+    BoxLayout:
+        orientation: "vertical"
+        padding: 35 # отступ от краев
+        spacing: 15 # расстояние между элементами
+        
+        Label:
+            text: "Добро пожаловать в KoreaVibe!"
+            
+            font_size: 38
+            bold: True
+            
+            size_hint_y: None
+            height: 70
+        
+        TextInput:
+            id: username
+            hint_text: "Имя пользователя"
+            multiline: False
+            size_hint_y: None
+            height: 55
+        
+        TextInput:
+            id: password
+            hint_text: "Пароль"
+            multiline: False
+            password: True
+            size_hint_y: None
+            height: 55
+            
+        Label:
+            id: message
+            text: ""
+            color: 1, 0, 0, 1
+            size_hint_y: None
+            height: 40
+            
+        Button:
+            text: "Войти"
+            font_size: 18
+            size_hint_y: None
+            height: 55
+            on_release: root.login()
+        
+        Button:
+            text: "Создать аккаунт"
+            font_size: 18
+            size_hint_y: None
+            height: 55
+            on_release: app.root.current = "register"
